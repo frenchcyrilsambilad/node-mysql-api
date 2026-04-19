@@ -11,14 +11,19 @@ export default function model(sequelize: any) {
         replacedByToken: { type: DataTypes.STRING },
         isExpired: {
             type: DataTypes.VIRTUAL,
-            get() { return Date.now() >= this.expires; }
+            get() { return Date.now() >= (this as any).expires; }
         },
         isActive: {
             type: DataTypes.VIRTUAL,
-            get() { return !this.revoked && !this.isExpired; }
+            get() { return !(this as any).revoked && !(this as any).isExpired; }
         }
     };
 
-    const options = { timestamps: false };
-    return sequelize.define('refresh-token', attributes, options);
+    const options = {
+        timestamps: false,
+        modelName: 'refreshToken',
+        tableName: 'refresh-tokens'
+    };
+
+    return sequelize.define('refreshToken', attributes, options);
 }
