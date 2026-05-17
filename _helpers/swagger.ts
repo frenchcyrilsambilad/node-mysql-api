@@ -7,7 +7,8 @@ import path from 'path';
 // Load the swagger.yaml file from the project root
 const swaggerDocument = YAML.load(path.join(__dirname, '..', 'swagger.yaml'));
 
-// Mount Swagger UI on the root path of this router
-router.use('/', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
+// Serve Swagger UI assets separately so asset requests do not receive the docs HTML.
+router.use('/', swaggerUi.serveFiles(swaggerDocument));
+router.get('/', swaggerUi.setup(swaggerDocument));
 
 export default router;
