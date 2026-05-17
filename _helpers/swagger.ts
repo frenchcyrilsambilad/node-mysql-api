@@ -1,14 +1,43 @@
 import express from 'express';
 const router = express.Router();
-import swaggerUi from 'swagger-ui-express';
 import YAML from 'yamljs';
 import path from 'path';
 
 // Load the swagger.yaml file from the project root
 const swaggerDocument = YAML.load(path.join(__dirname, '..', 'swagger.yaml'));
 
-// Serve Swagger UI assets separately so asset requests do not receive the docs HTML.
-router.use('/', swaggerUi.serveFiles(swaggerDocument));
-router.get('/', swaggerUi.setup(swaggerDocument));
+router.get('/swagger.json', (req, res) => {
+    res.json(swaggerDocument);
+});
+
+router.get('/', (req, res) => {
+    res.send(`<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>API Docs</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css" />
+</head>
+<body>
+    <div id="swagger-ui"></div>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-standalone-preset.js"></script>
+    <script>
+        window.onload = function () {
+            window.ui = SwaggerUIBundle({
+                url: '/api-docs/swagger.json',
+                dom_id: '#swagger-ui',
+                presets: [
+                    SwaggerUIBundle.presets.apis,
+                    SwaggerUIStandalonePreset
+                ],
+                layout: 'StandaloneLayout'
+            });
+        };
+    </script>
+</body>
+</html>`);
+});
 
 export default router;
