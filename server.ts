@@ -18,9 +18,9 @@ app.use(cookieParser());
 // Allow CORS requests from any origin and with credentials
 app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: true }));
 
-// Health check route
+// Redirect the homepage to the API docs.
 app.get('/', (req, res) => {
-    res.json({ message: 'Node MySQL API is running' });
+    res.redirect('/api-docs');
 });
 
 // API routes
