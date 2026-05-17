@@ -19,6 +19,14 @@ app.use(cookieParser());
 // Allow CORS requests from any origin and with credentials
 app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: true }));
 
+// Redirect the homepage to the API docs.
+app.get('/', (req, res) => {
+    res.redirect('/api-docs');
+});
+
+// Swagger documentation route
+app.use('/api-docs', swaggerDocs);
+
 app.use(async (_req, res, next) => {
     try {
         if (db.ready) await db.ready;
@@ -29,16 +37,8 @@ app.use(async (_req, res, next) => {
     }
 });
 
-// Redirect the homepage to the API docs.
-app.get('/', (req, res) => {
-    res.redirect('/api-docs');
-});
-
 // API routes
 app.use('/accounts', accountsController);
-
-// Swagger documentation route
-app.use('/api-docs', swaggerDocs);
 
 // Global error handler (must be defined after all routes)
 app.use(errorHandler);
