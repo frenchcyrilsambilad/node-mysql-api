@@ -1,13 +1,17 @@
 import config from '../config.json';
+import 'mysql2';
 import mysql from 'mysql2/promise';
 import { Sequelize } from 'sequelize';
 import accountModel from '../accounts/account.model';
 import refreshTokenModel from '../accounts/refresh-token.model';
 
 const db: any = {};
-export default db;
+db.ready = initialize().catch((err: any) => {
+    console.error('DB initialization failed:', err);
+    throw err;
+});
 
-initialize();
+export default db;
 
 async function initialize() {
     const { host, port, user, password, database } = config.database;
@@ -29,11 +33,11 @@ async function initialize() {
     db.RefreshToken = refreshTokenModel(sequelize);
 
     // Define relationships — this is what generates getRefreshTokens()
-    db.Account.hasMany(db.RefreshToken, { foreignKey: 'accountId', onDelete: 'CASCADE' });
-    db.RefreshToken.belongsTo(db.Account, { foreignKey: 'accountId' });
+    db.Account.hasMany(db.RefreshToken, { onDelete: 'CASCADE' });
+    db.RefreshToken.belongsTo(db.Account);
 
     // Sync models with database
-    await sequelize.sync({ alter: true });
+    await sequelize.sync();
 
     console.log('Database initialized successfully');
 }

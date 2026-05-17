@@ -3,6 +3,7 @@ import bodyParser from 'body-parser';
 import cookieParser from 'cookie-parser';
 import cors from 'cors';
 import errorHandler from './_middleware/error-handler';
+import db from './_helpers/db';
 import accountsController from './accounts/accounts.controller';
 import swaggerDocs from './_helpers/swagger';
 
@@ -17,6 +18,16 @@ app.use(cookieParser());
 
 // Allow CORS requests from any origin and with credentials
 app.use(cors({ origin: (origin, callback) => callback(null, true), credentials: true }));
+
+app.use(async (_req, res, next) => {
+    try {
+        if (db.ready) await db.ready;
+        next();
+    } catch (err) {
+        console.error('DB not ready:', err);
+        res.status(500).json({ message: 'Database not ready' });
+    }
+});
 
 // Redirect the homepage to the API docs.
 app.get('/', (req, res) => {
@@ -34,4 +45,8 @@ app.use(errorHandler);
 
 // Start server
 const port = process.env.NODE_ENV === 'production' ? (process.env.PORT || 80) : 4000;
-app.listen(port, () => console.log('Server listening on port ' + port));
+if (!process.env.VERCEL) {
+    app.listen(port, () => console.log('Server listening on port ' + port));
+}
+
+export default app;
