@@ -10,7 +10,7 @@ router.get('/swagger.json', (req, res) => {
     res.json(swaggerDocument);
 });
 
-router.get('/', (req, res) => {
+const swaggerPage = (req: express.Request, res: express.Response) => {
     res.send(`<!doctype html>
 <html lang="en">
 <head>
@@ -38,6 +38,8 @@ router.get('/', (req, res) => {
     </script>
 </body>
 </html>`);
-});
+};
+
+router.get(['/', ''], swaggerPage);
 
 export default router;
