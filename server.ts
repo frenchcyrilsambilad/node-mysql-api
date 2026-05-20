@@ -29,7 +29,8 @@ app.use('/api-docs', swaggerDocs);
 
 app.use(async (_req, res, next) => {
     try {
-        if (db.ready) await db.ready;
+        if (db.ensureReady) await db.ensureReady();
+        else if (db.ready) await db.ready;
         next();
     } catch (err) {
         console.error('DB not ready:', err);

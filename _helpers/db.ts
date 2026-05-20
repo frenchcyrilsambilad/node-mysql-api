@@ -6,12 +6,31 @@ import accountModel from '../accounts/account.model';
 import refreshTokenModel from '../accounts/refresh-token.model';
 
 const db: any = {};
-db.ready = initialize().catch((err: any) => {
-    console.error('DB initialization failed:', err);
-    throw err;
-});
+let readyPromise: Promise<void> | null = null;
+let initialized = false;
+
+db.ensureReady = ensureReady;
+db.ready = ensureReady();
 
 export default db;
+
+function ensureReady() {
+    if (initialized) return Promise.resolve();
+
+    if (!readyPromise) {
+        readyPromise = initialize()
+            .then(() => {
+                initialized = true;
+            })
+            .catch((err: any) => {
+                readyPromise = null;
+                console.error('DB initialization failed:', err);
+                throw err;
+            });
+    }
+
+    return readyPromise;
+}
 
 async function initialize() {
     const { host, port, user, password, database, ssl } = getDatabaseConfig();
