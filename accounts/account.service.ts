@@ -127,7 +127,7 @@ async function forgotPassword({ email }: any, origin: any) {
 async function validateResetToken({ token }: any) {
     if (!token) throw 'Invalid token';
 
-    const account = await db.Account.findOne({
+    const account = await db.Account.scope('withHash').findOne({
         where: {
             resetToken: token,
             resetTokenExpires: { [Op.gt]: new Date() }
