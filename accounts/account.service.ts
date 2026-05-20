@@ -142,6 +142,10 @@ async function validateResetToken({ token }: any) {
 async function resetPassword({ token, password }: any) {
     const account = await validateResetToken({ token });
 
+    if (await bcrypt.compare(password, account.passwordHash)) {
+        throw 'New password must be different from your current password';
+    }
+
     // update password and remove reset token
     account.passwordHash = await hash(password);
     account.passwordReset = new Date();
