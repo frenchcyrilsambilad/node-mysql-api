@@ -125,6 +125,8 @@ async function forgotPassword({ email }: any, origin: any) {
 }
 
 async function validateResetToken({ token }: any) {
+    if (!token) throw 'Invalid token';
+
     const account = await db.Account.findOne({
         where: {
             resetToken: token,
@@ -211,6 +213,8 @@ async function getAccount(id: any) {
 }
 
 async function getRefreshToken(token: any) {
+    if (!token) throw 'Invalid token';
+
     const refreshToken = await db.RefreshToken.findOne({ where: { token } });
     if (!refreshToken || !refreshToken.isActive) throw 'Invalid token';
     return refreshToken;
